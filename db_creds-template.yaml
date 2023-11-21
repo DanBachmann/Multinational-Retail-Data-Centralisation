@@ -1,0 +1,12 @@
+RDS_HOST: "data-handling-project-readonly.cq2e8zno855e.eu-west-1.rds.amazonaws.com"
+RDS_PASSWORD: 
+RDS_USER: 
+RDS_DATABASE: postgres
+RDS_PORT: 5432
+RDS_DATABASE_TYPE: postgresql
+LOCAL_HOST: localhost
+LOCAL_PASSWORD: 
+LOCAL_USER: 
+LOCAL_DATABASE: sales_data
+LOCAL_PORT: 
+LOCAL_DATABASE_TYPE: 
