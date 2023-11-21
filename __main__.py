@@ -21,14 +21,17 @@ def prerequisite_checks_ok(db_connector, data_extractor, extensive):
     if user_table not in table_names:
         logging.warn(f"PREREQUISITE CHECK FAILED: table {user_table} not found in database")
         return False
-    
-    if extensive:
-        logging.info("PREREQUISITE CHECK: card PDF")
-        data_frame = data_extractor.retrieve_pdf_data(card_data_url, 1)
-        if data_frame.empty:
-            logging.warn("PREREQUISITE CHECK FAILED: card PDF empty")
-            return False
-        
+
+    logging.info("PREREQUISITE CHECK: card PDF")
+    data_frame = data_extractor.retrieve_pdf_data(card_data_url, 1)
+    if data_frame.empty:
+        logging.warn("PREREQUISITE CHECK FAILED: card PDF empty")
+        return False
+
+    logging.info("PREREQUISITE CHECK: write access to target database")
+    db_connector.upload_to_db(data_frame, 'test')
+
+    if extensive:        
         logging.info("PREREQUISITE CHECK: API endpoints")
         number_of_stores = data_extractor.list_number_of_stores(api_header_dict, number_stores_url)
         if number_of_stores <1:
@@ -45,9 +48,6 @@ def prerequisite_checks_ok(db_connector, data_extractor, extensive):
         if data_frame.empty:
             logging.warn(f"PREREQUISITE CHECK FAILED: producs not found in {products_csv_uri}")
             return False
-        
-        logging.info("PREREQUISITE CHECK: write access to target database")
-        db_connector.upload_to_db(data_frame, 'test')
     
     logging.info("PREREQUISITE CHECKS: DONE")
     return True
