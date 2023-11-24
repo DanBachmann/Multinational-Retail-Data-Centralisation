@@ -8,10 +8,9 @@ class DataCleaning:
         for column in data_frame.columns:
                 data_frame[column] = data_frame[column].apply(self.replace_null_strings)
         data_frame.drop_duplicates(inplace=True)
-        # remove completely empty columns in a copy of the dataframe
+        # remove completely empty columns & rows in the dataframe
         data_frame.dropna(how="all", axis=1, inplace=True)
-        # remove mostly empty rows - often one row is the index
-        data_frame.dropna(thresh=2, axis=0, inplace=True)
+        data_frame.dropna(how="all", axis=0, inplace=True)
         return data_frame
     
     def replace_null_strings(self, cell_value):
@@ -31,23 +30,9 @@ class DataCleaning:
                 cell_value = None
         return cell_value
 
-    # def standardise_date_characters(self, cell_value):
-    #     if type(cell_value) == str:
-    #         cell_value = cell_value.replace('/','-').replace(' ','-')
-    #     return cell_value
-
-    # def clear_non_integer_cells(self, cell_value, clear_value=None):
-    #     if clear_value is None:
-    #         clear_value = cell_value
-    #     if cell_value is None:
-    #         return clear_value
-    #     try:
-    #         int_value = int(cell_value)
-    #     except ValueError:
-    #         return clear_value
-    #     return int_value
-    
     def clean_user_data(self, data_frame):
+        # we have the uuid as a unique key, so we can drop the index column
+        data_frame.drop(['index'], axis=1, inplace=True)
         # check date errors & set as date time type
         data_frame['date_of_birth'] = pd.to_datetime(data_frame['date_of_birth'], format='mixed', errors='coerce')
         data_frame['join_date'] = pd.to_datetime(data_frame['join_date'], format='mixed', errors='coerce')
@@ -77,6 +62,8 @@ class DataCleaning:
         return data_frame
 
     def called_clean_store_data(self, data_frame):
+        # we have the store_key as a unique key, so we can drop the index column
+        data_frame.drop(['index'], axis=1, inplace=True)
         # remove lat column which is empty and replaced with the latitude column
         data_frame.drop(['lat'], axis=1, inplace=True)
         data_frame = self.handle_nulls_empties_and_duplicates(data_frame)
@@ -84,12 +71,12 @@ class DataCleaning:
         # we didn't filter on country_code or continent because they have more values or values that are likely to expand in the future
         data_frame = data_frame[data_frame['store_type'].isin(["Mall Kiosk","Super Store","Local","Web Portal","Outlet"])]
         # fix some invalid data in continent field
+        pd.options.mode.chained_assignment = None  # default='warn'
         mask_continent = data_frame['continent'] == 'eeEurope'
         data_frame.loc[mask_continent, 'continent'] = 'Europe'
         mask_continent = data_frame['continent'] == 'eeAmerica'
         data_frame.loc[mask_continent, 'continent'] = 'America'
         # remove non-numerical characters from float values and set type
-        pd.options.mode.chained_assignment = None  # default='warn'
         data_frame['longitude'] = data_frame['longitude'].apply(self.remove_nonnumeric_characters)
         data_frame['longitude'] = data_frame['longitude'].astype('float', errors='ignore')
         data_frame['latitude'] = data_frame['latitude'].apply(self.remove_nonnumeric_characters)
@@ -101,11 +88,11 @@ class DataCleaning:
         data_frame['opening_date'] = pd.to_datetime(data_frame['opening_date'], format='mixed', errors='ignore')
         pd.options.mode.chained_assignment = 'warn'  # back to default mode
         # re-order so into a more logical order of identification, attributes, location
-        data_frame = data_frame[['index', 'store_code', 'store_type', 'staff_numbers', 'opening_date', 'address','locality', 'continent', 'country_code', 'longitude', 'latitude']]
+        data_frame = data_frame[['store_code', 'store_type', 'staff_numbers', 'opening_date', 'address','locality', 'continent', 'country_code', 'longitude', 'latitude']]
         return data_frame
     
     def reformat_phone_data(self, data_frame, column_name):
-        regex_expression = r'^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$' #Our regular expression to match
+        regex_expression = r'^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$'
         data_frame.loc[~data_frame[column_name].str.match(regex_expression), column_name] = None # For every row where the column_name column does not match our regular expression, replace the value with None/null
         data_frame[column_name] = data_frame[column_name].replace({r'\+44(0)': '0',r'\+44': '0', r'\(': '', r'\)': '', r'-': '', r' ': ''}, regex=True)
 
@@ -149,12 +136,13 @@ class DataCleaning:
         return products_data_frame
     
     def clean_products_data(self, data_frame):
-        # TODO: more data cleaning
+        # the 'Unnamed: 0' column looks like the index. we have the uuid, so we can drop it
+        data_frame.drop(['Unnamed: 0'], axis=1, inplace=True)
         data_frame = self.convert_product_weights(data_frame)
         data_frame['currency'] = data_frame['product_price'].apply(lambda x: x[:1] if type(x)==str else '£')
         pd.options.mode.chained_assignment = None  # default='warn'
         # rows with no currency symbol are bogus based on our data review so remove them
-        regex_expression = r'^[£€\$]' #Our regular expression to match
+        regex_expression = r'^[£€\$]'
         data_frame = data_frame.loc[data_frame['currency'].str.match(regex_expression)]
         data_frame['product_price'] = data_frame['product_price'].apply(self.remove_nonnumeric_characters)
         data_frame.product_price = data_frame.product_price.astype('float')
@@ -168,10 +156,13 @@ class DataCleaning:
     def clean_orders_data(self, data_frame):
         # remove columns as per specification: first_name, last_name and 1
         data_frame.drop(['first_name', 'last_name', '1'], axis=1, inplace=True)
-        # remove level_0 column which is a duplicate of index
-        data_frame.drop(['level_0'], axis=1, inplace=True)
+        # we can drop index since we have level_0 as a unique key
+        data_frame.drop(['index'], axis=1, inplace=True)
         return self.handle_nulls_empties_and_duplicates(data_frame)
 
     def clean_time_data(self, data_frame):
-        # TODO: more data cleaning
+        # consolodate time value fields into one datetime column
+        data_frame['date_timestamp'] = data_frame['year'] + '-' + data_frame['month'] + '-' + data_frame['day'] + ' ' + data_frame['timestamp']
+        data_frame['date_timestamp'] = pd.to_datetime(data_frame['date_timestamp'], errors='coerce')
+        data_frame.drop(['year', 'month', 'day', 'timestamp'], axis=1, inplace=True)
         return self.handle_nulls_empties_and_duplicates(data_frame)

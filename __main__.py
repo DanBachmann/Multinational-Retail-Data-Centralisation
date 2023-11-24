@@ -55,7 +55,6 @@ def prerequisite_checks_ok(extensive):
             logging.error(f"PREREQUISITE CHECK FAILED: time data not found in {date_details_url}")
             return False
 
-    
     logging.info("PREREQUISITE CHECKS: DONE")
     return True
 
@@ -90,9 +89,10 @@ def process_orders():
     source_table = 'orders_table'
     data_frame = data_extractor.read_rds_table(db_connector, source_table)
     logging.info("ORDERS: cleaning data")
-    clean_data_frame = data_cleaning.clean_orders_data(data_frame)
-    logging.info("ORDERS: saving to database")
-    db_connector.upload_to_db(clean_data_frame, 'orders_table')
+    table_name = 'orders_table'
+    start_size = upload_to_db_raw(data_frame, table_name)
+    data_frame = data_cleaning.clean_orders_data(data_frame)
+    upload_to_db(data_frame, table_name, start_size)
     logging.info("ORDERS: DONE")
 
 def process_cards():
@@ -126,17 +126,31 @@ def process_products():
     upload_to_db(data_frame, table_name, start_size)
     logging.info("PRODUCTS: DONE")
 
-def process_time_data():
+def process_times():
     logging.info("TIME: reading data from HTTPS")
     data_frame = data_extractor.extract_from_json(date_details_url)
     logging.info("TIME: cleaning data")
-    clean_data_frame = data_cleaning.clean_time_data(data_frame)
-    logging.info("TIME: saving to database")
-    db_connector.upload_to_db(clean_data_frame, 'dim_date_times')
+    table_name = 'dim_date_times'
+    start_size = upload_to_db_raw(data_frame, table_name)
+    data_frame = data_cleaning.clean_time_data(data_frame)
+    upload_to_db(data_frame, table_name, start_size)
     logging.info("TIME: DONE")
 
 logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO, datefmt="%H:%M:%S")
 logging.info("Multinational Retail Data Centralisation project starting")
+thread_function_list = [process_users, process_cards, process_stores, process_products, process_orders, process_times]
+
+# check valid arguments
+valid_arguments_list = []
+valid_arguments_list.append('checks_extensive')
+valid_arguments_list.append('checks')
+valid_arguments_list.append('write_raw')
+for thread_function in thread_function_list:
+    valid_arguments_list.append(thread_function.__name__)
+for arg in sys.argv:
+    if arg not in valid_arguments_list and arg!='.':
+        logging.error(f"invalid argument {arg} specified. valid arguments are {valid_arguments_list}")
+        exit()
 
 # initialise stateless worker classes
 db_connector = DatabaseConnector()
@@ -160,7 +174,6 @@ if extensive_checks or 'checks' in sys.argv:
         exit()
 
 # since these processes are heavily io bound with different sources we can run them in parallel for a performance increase
-thread_function_list = [process_users, process_cards, process_stores, process_products, process_orders, process_time_data]
 thread_list = []
 # if we have specified processes on the command line, then run those; otherwise, run them all
 for thread_function in thread_function_list:
