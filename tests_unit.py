@@ -1,6 +1,7 @@
 import unittest
-
 from database_utils import DatabaseConnector
+from data_extraction import DataExtractor
+
 class TestDatabaseUtils(unittest.TestCase):
     def test_read_db_creds(self):
         db_connector = DatabaseConnector()
@@ -18,6 +19,16 @@ class TestDatabaseUtils(unittest.TestCase):
         self.assertTrue(db_creds['LOCAL_PORT'])
         self.assertTrue(db_creds['LOCAL_DATABASE'])
         self.assertTrue(db_creds['LOCAL_DATABASE_TYPE'])
+    
+    def test_read_api_creds(self):
+        db_extractor = DataExtractor()
+        api_creds = db_extractor.read_api_creds()
+        self.assertTrue(api_creds['stores_api_key'])
+        self.assertTrue(api_creds['number_stores_url'])
+        self.assertTrue(api_creds['store_data_template'])
+        self.assertTrue(api_creds['card_data_url'])
+        self.assertTrue(api_creds['products_csv_uri'])
+        self.assertTrue(api_creds['date_details_url'])
 
     def test_init_db_engine(self):
         db_connector = DatabaseConnector()

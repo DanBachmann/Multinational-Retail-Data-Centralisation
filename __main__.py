@@ -136,9 +136,13 @@ def process_times():
     upload_to_db(data_frame, table_name, start_size)
     logging.info("TIME: DONE")
 
+# dummy function - when if specified alone, no threads will run. Useful for just doing pre-requisite checks.
+def do_nothing():
+    return
+
 logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO, datefmt="%H:%M:%S")
 logging.info("Multinational Retail Data Centralisation project starting")
-thread_function_list = [process_users, process_cards, process_stores, process_products, process_orders, process_times]
+thread_function_list = [process_users, process_cards, process_stores, process_products, process_orders, process_times, do_nothing]
 
 # check valid arguments
 valid_arguments_list = []
