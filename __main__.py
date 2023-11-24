@@ -112,7 +112,7 @@ def process_stores():
     logging.info("STORES: cleaning data")
     table_name = 'dim_store_details'
     start_size = upload_to_db_raw(data_frame, table_name)
-    data_frame = data_cleaning.called_clean_store_data(data_frame)
+    data_frame = data_cleaning.clean_store_data(data_frame)
     upload_to_db(data_frame, table_name, start_size)
     logging.info("STORES: DONE")
 

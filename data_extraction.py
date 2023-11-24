@@ -7,6 +7,13 @@ import yaml
 class DataExtractor:
     # read the API credentials/URLs
     def read_api_creds(self):
+        '''
+        Loads configuration for the databases from a file (api_creds.yaml).
+            Parameters:
+                    none.
+            Returns:
+                    config_data (dictionary): The values for establishing source(RDS) and target(local) database connections.
+        '''
         with open('api_creds.yaml', 'r') as file:
             config_data = yaml.safe_load(file)
         return config_data
