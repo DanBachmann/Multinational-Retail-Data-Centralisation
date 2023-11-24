@@ -1,0 +1,6 @@
+stores_api_key: 
+number_stores_url: 'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores'
+store_data_template: 'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details/{store_number}'
+card_data_url: 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
+products_csv_uri: 's3://data-handling-public/products.csv' #  https://data-handling-public.s3.eu-west-1.amazonaws.com/products.csv
+date_details_url: 'https://data-handling-public.s3.eu-west-1.amazonaws.com/date_details.json'
