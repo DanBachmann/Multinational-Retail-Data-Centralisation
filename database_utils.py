@@ -15,10 +15,11 @@ class DatabaseConnector:
         engine = sqlalchemy.create_engine(engine_url)
         return engine
 
+    # list the tables in the database for exploratory work
     def list_db_tables(self, engine):
         inspector = sqlalchemy.inspect(engine)
         return inspector.get_table_names()
-    
+
     # upload data to database table. NOTE: table & data will be replaced
     def upload_to_db(self, source_data_frame, target_table_name):
         db_creds = self.read_db_creds()
