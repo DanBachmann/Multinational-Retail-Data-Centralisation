@@ -3,6 +3,7 @@ import threading
 from data_cleaning import DataCleaning
 from data_extraction import DataExtractor
 from database_utils import DatabaseConnector
+import sqlalchemy.types as types
 
 class ProcessManager:
     # initialise stateless worker classes
@@ -112,7 +113,7 @@ class ProcessManager:
         if self.write_raw_data:
             return self.__upload_to_db(data_frame, table_name+'_raw')
         return data_frame.shape[0]
-    def __upload_to_db(self, data_frame, table_name, start_size=None):
+    def __upload_to_db(self, data_frame, table_name, start_size, dtypes=None):
         if start_size is not None:
             reduction_percent = 100-100*data_frame.shape[0]/start_size
             if reduction_percent > 10:
@@ -120,7 +121,7 @@ class ProcessManager:
             elif reduction_percent > 0:
                 logging.info(f"{table_name}: {start_size} rows -> {data_frame.shape[0]} rows = {round( reduction_percent,1)}%  reduction")
         logging.info("saving to database in "+table_name)
-        self.db_connector.upload_to_db(data_frame, table_name)
+        self.db_connector.upload_to_db(data_frame, table_name, dtypes)
         return data_frame.shape[0]
 
     def process_users(self):
@@ -131,7 +132,19 @@ class ProcessManager:
         table_name = "dim_users"
         start_size = self.__upload_to_db_raw(data_frame, table_name)
         data_frame =  self.data_cleaning.clean_user_data(data_frame)
-        self.__upload_to_db(data_frame, table_name, start_size)
+
+        # convert types as specified in milestone 3
+        # | first_name     | TEXT               | VARCHAR(255)       |
+        # | last_name      | TEXT               | VARCHAR(255)       |
+        # | date_of_birth  | TEXT               | DATE               |
+        # | country_code   | TEXT               | VARCHAR(?)         |
+        # | user_uuid      | TEXT               | UUID               |
+        # | join_date      | TEXT               | DATE               |
+        country_code_max_len = data_frame.country_code.map(lambda x: len(x)).max()
+        dtypes={'first_name': types.VARCHAR(255), 'last_name': types.VARCHAR(255), 'country_code': types.VARCHAR(country_code_max_len),
+            'date_of_birth': types.DATE, 'join_date': types.DATE,
+            'user_uuid': types.UUID}
+        self.__upload_to_db(data_frame, table_name, start_size, dtypes)
         logging.info("USERS: DONE")
 
     def process_orders(self):
@@ -142,7 +155,20 @@ class ProcessManager:
         table_name = 'orders_table'
         start_size = self.__upload_to_db_raw(data_frame, table_name)
         data_frame =  self.data_cleaning.clean_orders_data(data_frame)
-        self.__upload_to_db(data_frame, table_name, start_size)
+
+        # convert types as specified in milestone 3
+        # | date_uuid        | TEXT               | UUID               |
+        # | user_uuid        | TEXT               | UUID               |
+        # | card_number      | TEXT               | VARCHAR(?)         |
+        # | store_code       | TEXT               | VARCHAR(?)         |
+        # | product_code     | TEXT               | VARCHAR(?)         |
+        # | product_quantity | BIGINT             | SMALLINT           |
+        store_code_max_len = data_frame.store_code.map(lambda x: len(x)).max()
+        card_number_max_len = data_frame.card_number.map(lambda x: len(str(x))).max()
+        product_code_max_len = data_frame.product_code.map(lambda x: len(str(x))).max()
+        dtypes={'store_code': types.VARCHAR(store_code_max_len), 'card_number': types.VARCHAR(card_number_max_len), 'product_code': types.VARCHAR(product_code_max_len),
+            'product_quantity': types.SMALLINT, 'date_uuid': types.UUID, 'user_uuid': types.UUID}
+        self.__upload_to_db(data_frame, table_name, start_size, dtypes)
         logging.info("ORDERS: DONE")
 
     def process_cards(self):
@@ -153,7 +179,15 @@ class ProcessManager:
         table_name = 'dim_card_details'
         start_size = self.__upload_to_db_raw(data_frame, table_name)
         data_frame =  self.data_cleaning.clean_card_data(data_frame)
-        self.__upload_to_db(data_frame, table_name, start_size)
+
+        # convert types as specified in milestone 3
+        # | card_number            | TEXT              | VARCHAR(?)         |
+        # | expiry_date            | TEXT              | VARCHAR(?)         |
+        # | date_payment_confirmed | TEXT              | DATE               |
+        card_number_max_len = data_frame.card_number.map(lambda x: len(str(x))).max()
+        expiry_date_max_len = data_frame.expiry_date.map(lambda x: len(str(x))).max()
+        dtypes={'card_number': types.VARCHAR(card_number_max_len), 'expiry_date': types.VARCHAR(expiry_date_max_len), 'date_payment_confirmed': types.DATE}
+        self.__upload_to_db(data_frame, table_name, start_size, dtypes)
         logging.info("CARDS: DONE")
 
     def process_stores(self):
@@ -167,7 +201,25 @@ class ProcessManager:
         table_name = 'dim_store_details'
         start_size = self.__upload_to_db_raw(data_frame, table_name)
         data_frame =  self.data_cleaning.clean_store_data(data_frame)
-        self.__upload_to_db(data_frame, table_name, start_size)
+
+        # convert types as specified in milestone 3
+        # | longitude           | TEXT              | FLOAT                  |
+        # | locality            | TEXT              | VARCHAR(255)           |
+        # | store_code          | TEXT              | VARCHAR(?)             |
+        # | staff_numbers       | TEXT              | SMALLINT               |
+        # | opening_date        | TEXT              | DATE                   |
+        # | store_type          | TEXT              | VARCHAR(255) NULLABLE  |
+        # | latitude            | TEXT              | FLOAT                  |
+        # | country_code        | TEXT              | VARCHAR(?)             |
+        # | continent           | TEXT              | VARCHAR(255)           |
+        store_code_max_len = data_frame.store_code.map(lambda x: len(x)).max()
+        country_code_max_len = data_frame.country_code.map(lambda x: len(x)).max()
+        dtypes={'store_code': types.VARCHAR(store_code_max_len),
+            'locality': types.VARCHAR(255), 'country_code': types.VARCHAR(country_code_max_len), 'continent': types.VARCHAR(255),
+            'staff_numbers': types.SMALLINT, 'opening_date': types.DATE,
+            'longitude': types.FLOAT, 'latitude': types.FLOAT
+            }
+        self.__upload_to_db(data_frame, table_name, start_size, dtypes)
         logging.info("STORES: DONE")
 
     def process_products(self):
@@ -178,7 +230,26 @@ class ProcessManager:
         table_name = 'dim_products'
         start_size = self.__upload_to_db_raw(data_frame, table_name)
         data_frame =  self.data_cleaning.clean_products_data(data_frame)
-        self.__upload_to_db(data_frame, table_name, start_size)
+
+        # convert types as specified in milestone 3
+        # | product_price   | TEXT               | FLOAT              |
+        # | weight          | TEXT               | FLOAT              |
+        # | EAN             | TEXT               | VARCHAR(?)         |
+        # | product_code    | TEXT               | VARCHAR(?)         |
+        # | date_added      | TEXT               | DATE               |
+        # | uuid            | TEXT               | UUID               |
+        # | still_available | TEXT               | BOOL               |
+        # | weight_class    | TEXT               | VARCHAR(?)         |
+        EAN_max_len = data_frame.EAN.map(lambda x: len(str(x))).max()
+        product_code_max_len = data_frame.product_code.map(lambda x: len(str(x))).max()
+        weight_class_max_len = data_frame.weight_class.map(lambda x: len(x)).max()
+        dtypes={'EAN': types.VARCHAR(EAN_max_len), 'product_code': types.VARCHAR(product_code_max_len), 'weight_class': types.VARCHAR(weight_class_max_len),
+            'continent': types.VARCHAR(255),
+            'uuid': types.UUID, 'date_added': types.DATE,
+            'product_price': types.FLOAT, 'weight': types.FLOAT,
+            'currency': types.VARCHAR(3)
+            }
+        self.__upload_to_db(data_frame, table_name, start_size, dtypes)
         logging.info("PRODUCTS: DONE")
 
     def process_times(self):
@@ -189,7 +260,14 @@ class ProcessManager:
         table_name = 'dim_date_times'
         start_size = self.__upload_to_db_raw(data_frame, table_name)
         data_frame =  self.data_cleaning.clean_time_data(data_frame)
-        self.__upload_to_db(data_frame, table_name, start_size)
+
+        # | month           | TEXT              | VARCHAR(?) - Already handled by making a standard datetime stamp. Will leave as is unless the project requires it different later.
+        # | year            | TEXT              | VARCHAR(?) - Already handled by making a standard datetime stamp. Will leave as is unless the project requires it different later.
+        # | day             | TEXT              | VARCHAR(?) - Already handled by making a standard datetime stamp. Will leave as is unless the project requires it different later.
+        # | time_period     | TEXT              | VARCHAR(?) - Already handled by making a standard datetime stamp. Will leave as is unless the project requires it different later.
+        # | date_uuid       | TEXT              | UUID               |
+        dtypes={'date_uuid': types.UUID}
+        self.__upload_to_db(data_frame, table_name, start_size, dtypes)
         logging.info("TIME: DONE")
 
     # dummy function - when if specified alone, no threads will run. Useful for just doing pre-requisite checks.

@@ -90,6 +90,15 @@ class DataCleaning:
         products_data_frame.weight = products_data_frame.weight.astype('float')
         return products_data_frame
     
+    def __assign_weight_class(self, weight):
+        if weight < 2:
+            return 'Light'
+        if weight < 40:
+            return 'Mid_Sized'
+        if weight < 140:
+            return 'Heavy'
+        return 'Truck_Required'
+
     def clean_user_data(self, data_frame):
         '''
         Cleans legacy user data and sets column types as appropriate.
@@ -208,8 +217,10 @@ class DataCleaning:
         data_frame.product_price = data_frame.product_price.astype('float')
         data_frame['date_added'] = pd.to_datetime(data_frame['date_added'], errors='coerce')
         data_frame = self.__handle_nulls_empties_and_duplicates(data_frame)
-        data_frame['removed'] = data_frame['removed'].apply(lambda x: True if x is not None and type(x) == str and x.lower() == 'removed' else False)
-        data_frame['removed'] = data_frame['removed'].astype('bool')
+        data_frame['still_available'] = data_frame['removed'].apply(lambda x: False if x is not None and type(x) == str and x.lower() == 'removed' else True)
+        data_frame['still_available'] = data_frame['still_available'].astype('bool')
+        data_frame.drop(['removed'], axis=1, inplace=True)
+        data_frame['weight_class'] = data_frame['weight'].apply(self.__assign_weight_class)
         pd.options.mode.chained_assignment = 'warn'
         return data_frame
 
@@ -242,4 +253,6 @@ class DataCleaning:
         data_frame['date_timestamp'] = data_frame['year'] + '-' + data_frame['month'] + '-' + data_frame['day'] + ' ' + data_frame['timestamp']
         data_frame['date_timestamp'] = pd.to_datetime(data_frame['date_timestamp'], errors='coerce')
         data_frame.drop(['year', 'month', 'day', 'timestamp'], axis=1, inplace=True)
-        return self.__handle_nulls_empties_and_duplicates(data_frame)
+        # bad dates will be null now. there's no useful information in those rows, so drop them
+        data_frame.dropna(inplace=True)
+        return data_frame

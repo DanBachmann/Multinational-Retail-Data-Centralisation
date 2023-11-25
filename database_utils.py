@@ -43,14 +43,17 @@ class DatabaseConnector:
         return inspector.get_table_names()
 
     # upload data to database table. NOTE: table & data will be replaced
-    def upload_to_db(self, source_data_frame, target_table_name):
+    def upload_to_db(self, source_data_frame, target_table_name, dtypes = None):
         '''
         Save the dataframe in a table (target_table_name) on the local/target database.
             Parameters:
                     source_data_frame (Pandas dataframe): Source data to write.
                     target_table_name (str): Target table to write the data into. Note existing data in the specified table will be removed/overwritten.
+                    dtypes (dictionary of sqlalchemy.types) (optional): A dictionary of column names and their corresponding SQL types.
+            Returns:
+                    none.
         '''
         db_creds = self.read_db_creds()
         target_engine = self.init_db_engine(db_creds, 'LOCAL_')
         with target_engine.execution_options(isolation_level='AUTOCOMMIT').connect() as con:
-            source_data_frame.to_sql(target_table_name, target_engine, if_exists='replace', index=False)
+            source_data_frame.to_sql(target_table_name, target_engine, if_exists='replace', index=False, dtype = dtypes)
