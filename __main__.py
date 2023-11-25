@@ -23,4 +23,6 @@ for thread in thread_list:
 for thread in thread_list:
     thread.join()
 
+process_manager.finalise()
+
 logging.info("all done")

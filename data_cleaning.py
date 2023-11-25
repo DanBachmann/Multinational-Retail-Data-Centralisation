@@ -20,7 +20,7 @@ class DataCleaning:
     
     def __remove_unwanted_characters(self, cell_value):
         if type(cell_value) == str:
-            cell_value = cell_value.replace('?','')
+            cell_value = cell_value.replace('?','').replace('.','')
         return cell_value
     
     def __remove_nonnumeric_characters(self, cell_value):
@@ -124,8 +124,10 @@ class DataCleaning:
         mask_country = data_frame['country'] == 'United Kingdom'
         data_frame.loc[mask_country, 'country_code'] = 'GB'
         # email_addresses - the data without a simple @ in the email address has the entire row as invalid in this table, so remove those rows
+        pd.options.mode.chained_assignment = None  # default='warn'
         mask_email_address = data_frame['email_address'].str.contains('@')
         data_frame = data_frame.loc[mask_email_address]
+        pd.options.mode.chained_assignment = 'warn'
         return data_frame
 
     # remove any erroneous values, NULL values or errors with formatting.
@@ -141,14 +143,16 @@ class DataCleaning:
                     data_frame (Pandas Dataframe): The modified dataframe.
         '''
         data_frame = self.__handle_nulls_empties_and_duplicates(data_frame)
-        # clean card_number to int64. if there is invalid data, there is no use for the entry without the card_number key, so remove it as these are relatively few entries anyway
+        pd.options.mode.chained_assignment = None  # default='warn'
+        # expiry_date - the data without a / in the expiry date has the entire row as invalid in this table, so remove those rows
+        expiry_date_mask = data_frame['expiry_date'].str.contains('/')
+        data_frame = data_frame.loc[expiry_date_mask]
+        # clean card_number. We could convert them to numeric with pd.to_numeric or force them to typeint64, but since this will be a varchar column, leave as text
         data_frame['card_number'] = data_frame['card_number'].apply(self.__remove_unwanted_characters)
-        data_frame['card_number'] = pd.to_numeric(data_frame['card_number'], errors='coerce')
-        data_frame.dropna(inplace=True)
-        data_frame['card_number'] = data_frame['card_number'].astype('int64', errors='ignore')
         # set date_payment_confirmed as date type
         data_frame['date_payment_confirmed'] = data_frame['date_payment_confirmed'].apply(self.__remove_unwanted_characters)
         data_frame['date_payment_confirmed'] = pd.to_datetime(data_frame['date_payment_confirmed'], errors='coerce')
+        pd.options.mode.chained_assignment = 'warn'
         return data_frame
 
     def clean_store_data(self, data_frame):
@@ -207,6 +211,7 @@ class DataCleaning:
         '''
         # the 'Unnamed: 0' column looks like the index. we have the uuid, so we can drop it
         data_frame.drop(['Unnamed: 0'], axis=1, inplace=True)
+        data_frame = self.__handle_nulls_empties_and_duplicates(data_frame)
         data_frame = self.__convert_product_weights(data_frame)
         data_frame['currency'] = data_frame['product_price'].apply(lambda x: x[:1] if type(x)==str else '£')
         pd.options.mode.chained_assignment = None  # default='warn'
@@ -216,7 +221,6 @@ class DataCleaning:
         data_frame['product_price'] = data_frame['product_price'].apply(self.__remove_nonnumeric_characters)
         data_frame.product_price = data_frame.product_price.astype('float')
         data_frame['date_added'] = pd.to_datetime(data_frame['date_added'], errors='coerce')
-        data_frame = self.__handle_nulls_empties_and_duplicates(data_frame)
         data_frame['still_available'] = data_frame['removed'].apply(lambda x: False if x is not None and type(x) == str and x.lower() == 'removed' else True)
         data_frame['still_available'] = data_frame['still_available'].astype('bool')
         data_frame.drop(['removed'], axis=1, inplace=True)

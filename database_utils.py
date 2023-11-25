@@ -43,17 +43,37 @@ class DatabaseConnector:
         return inspector.get_table_names()
 
     # upload data to database table. NOTE: table & data will be replaced
-    def upload_to_db(self, source_data_frame, target_table_name, dtypes = None):
+    def upload_to_db(self, source_data_frame, target_table_name, dtypes = None, primary_key = None):
         '''
         Save the dataframe in a table (target_table_name) on the local/target database.
             Parameters:
                     source_data_frame (Pandas dataframe): Source data to write.
                     target_table_name (str): Target table to write the data into. Note existing data in the specified table will be removed/overwritten.
                     dtypes (dictionary of sqlalchemy.types) (optional): A dictionary of column names and their corresponding SQL types.
+                    primary_key (str) (optional): The name of the primary key column.
             Returns:
                     none.
         '''
         db_creds = self.read_db_creds()
         target_engine = self.init_db_engine(db_creds, 'LOCAL_')
+        source_data_frame.to_sql(target_table_name, target_engine, if_exists='replace', index=False, dtype = dtypes)
         with target_engine.execution_options(isolation_level='AUTOCOMMIT').connect() as con:
             source_data_frame.to_sql(target_table_name, target_engine, if_exists='replace', index=False, dtype = dtypes)
+            if primary_key is not None:
+                con.execute(sqlalchemy.text(f'ALTER TABLE public.{target_table_name} ADD PRIMARY KEY ({primary_key});'))
+    
+    def add_foreign_key(self, target_table_name, target_column, source_table, source_column):
+        db_creds = self.read_db_creds()
+        target_engine = self.init_db_engine(db_creds, 'LOCAL_')
+        with target_engine.execution_options(isolation_level='AUTOCOMMIT').connect() as con:
+            con.execute(sqlalchemy.text(f'ALTER TABLE public.{target_table_name} ADD CONSTRAINT fk_{source_table}_{source_column} FOREIGN KEY ({target_column}) REFERENCES {source_table} ({source_column});'))
+
+    def drop_foreign_key(self, target_table_name, source_table, source_column):
+        db_creds = self.read_db_creds()
+        target_engine = self.init_db_engine(db_creds, 'LOCAL_')
+        try:
+            with target_engine.execution_options(isolation_level='AUTOCOMMIT').connect() as con:
+                con.execute(sqlalchemy.text(f'ALTER TABLE {target_table_name} DROP CONSTRAINT fk_{source_table}_{source_column};'))
+        except:
+            # Key may not exist, so pass.
+            pass
