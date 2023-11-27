@@ -7,7 +7,25 @@ Multinational Retail Data Centralisation is a project to demonstrate data handin
 <li>Postgresql table manipulation with SqlAlchemy.
 <li>Unit testing with Python.
 <li>Basic threading with Python.
+<li>SQL lead function with CTE table
 </ul>
+
+## Installation Instructions
+This project was written for Python 3 with the following libraries and their dependancies:
+
+      - boto3==1.29.4
+      - numpy==1.26.2
+      - pandas==2.1.3
+      - psycopg2-binary==2.9.9
+      - python-dateutil==2.8.2
+      - pyyaml==6.0.1
+      - requests==2.31.0
+      - sqlalchemy==2.0.23
+      - tabula-py==2.9.0
+More details can be found in the environment_configurations folder which has output from the conda environments used for both Linux and Windows envs.
+
+### Configuration Files
+There are two configuration files, db_creds.yaml and api_creds.yaml which contain all the configuration for the legacy source RDS database, target database, API endpoints and credentials. For security reasons, the files are not included in this repository, but templates are provided (db_creds-template.yaml and api_creds-template.yaml) in the environment_configurations folder. After filling these templates in, save them to the project root as db_creds.yaml and api_creds.yaml.
 
 ## Usage instructions
 To execute the project, we can simply run the directory such as:<br/>
@@ -32,22 +50,8 @@ To execute the project, we can simply run the directory such as:<br/>
 So a use with options to perform basic pre-requisite checks and process just the users and cards would look like:<br/>
 <code>python . checks process_users process_cards</code>
 
-## Installation Instructions
-This project was written for Python 3 with the following libraries and their dependancies:
-
-      - boto3==1.29.4
-      - numpy==1.26.2
-      - pandas==2.1.3
-      - psycopg2-binary==2.9.9
-      - python-dateutil==2.8.2
-      - pyyaml==6.0.1
-      - requests==2.31.0
-      - sqlalchemy==2.0.23
-      - tabula-py==2.9.0
-More details can be found in the environment_configurations folder which has output from the conda environments used for both Linux and Windows envs.
-
-### Configuration Files
-There are two configuration files, db_creds.yaml and api_creds.yaml which contain all the configuration for the legacy source RDS database, target database, API endpoints and credentials. For security reasons, the files are not included in this repository, but templates are provided (db_creds-template.yaml and api_creds-template.yaml) in the environment_configurations folder. After filling these templates in, save them to the project root as db_creds.yaml and api_creds.yaml.
+### Reporting
+Ad hoc reporting is done with SQl queries in a tool such as PgAdmin. The data requests for milestone 4 are in metrics_miletstone4.sql where each query can be highlighted and quickly executed.
 
 ## Developer Information
 ### Multi-threaded Architecture
