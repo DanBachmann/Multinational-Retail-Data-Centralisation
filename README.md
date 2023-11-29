@@ -33,8 +33,7 @@ To execute the project, we can simply run the directory such as:<br/>
 <code>python .</code>
 <br>
 
-<video src='https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/all_processes.mp4' width=852>
-
+https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3606253/bfd1bc31-917d-4bec-9452-8833fdeb1d0a
 
 
 ### Optional Parameters
@@ -56,7 +55,7 @@ To execute the project, we can simply run the directory such as:<br/>
 So a use with options to perform basic pre-requisite checks and process just the users and cards would look like:<br/>
 <code>python . checks process_users process_cards</code>
 
-<video src='https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/selective_processes.mp4' width=852>
+https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3606253/a9927149-f4aa-497e-b339-9cd708b9dfe4
 
 
 ### Reporting
@@ -64,7 +63,7 @@ Ad hoc reporting is done with SQl queries in a tool such as PgAdmin. The data re
 metrics_miletstone4.sql</code>
 where each query can be highlighted and quickly executed.
 
-<video src='https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/database_queries.mp4' width=852>
+https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3606253/fdfca68c-1929-4c1c-b782-0d0078ebc0af
 
 
 ## Developer Information
