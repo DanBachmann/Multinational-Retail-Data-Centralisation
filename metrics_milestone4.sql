@@ -90,6 +90,5 @@ select year, avg(time_delta) as actual_time_taken from t_time_deltas
 	group by year
 	order by actual_time_taken desc
 	limit 5;
-/* getting a different value for seconds for most years - up to 5 seconds difference from 'expected result'.
+/* getting a different value for seconds for most years - no more than 5 seconds difference from 'expected result'.
 	 likely to be due to the date being converted in Python Pandas in my solution vs in SQL */
-

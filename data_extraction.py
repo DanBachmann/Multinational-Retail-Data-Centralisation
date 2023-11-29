@@ -19,7 +19,7 @@ class DataExtractor:
         return config_data
 
     # extract the database table to a pandas DataFrame
-    def read_rds_table(self, db_connector, table_name):
+    def read_rds_table(self, db_connector: str, table_name: str) -> pd.DataFrame:
         '''
         Reads a database table into a Pandas dataframe.
             Parameters:
@@ -35,7 +35,7 @@ class DataExtractor:
 
     # returns a Pandas DataFrame from a link to a PDF.
     # Note this uses Tabula which requires Java/JRE to be installed
-    def retrieve_pdf_data(self, url, pages='all'):
+    def retrieve_pdf_data(self, url: str, pages='all') -> pd.DataFrame:
         '''
         Loads tables in a PDF into a dataframe.
             Parameters:
@@ -47,7 +47,7 @@ class DataExtractor:
         return pd.concat(pdf_data)
 
     # returns the number of stores to extract
-    def list_number_of_stores(self, api_header_dict, number_stores_endpoint_url):
+    def list_number_of_stores(self, api_header_dict: dict[str, str], number_stores_endpoint_url: str):
         '''
         Returns the number of stores
             Parameters:
@@ -60,7 +60,7 @@ class DataExtractor:
         return response.json()["number_stores"]
     
     # extracts all stores from the API saving them in a pandas DataFrame
-    def retrieve_stores_data(self, api_header_dict, store_data_endpoint_template, max_store_number):
+    def retrieve_stores_data(self, api_header_dict: dict[str, str], store_data_endpoint_template: str, max_store_number) -> pd.DataFrame:
         '''
         Returns the details for stores up to max_store_number.
             Parameters:
@@ -75,7 +75,7 @@ class DataExtractor:
     
     # extracts a range of stores from the API saving them in a list
     # this can be used to extract a subset of stores for use in a multi-threaded download or to allow for the process to be interrupted or monitored
-    def retrieve_stores_data_range(self, api_header_dict, store_data_endpoint_template, max_store_number, min_store_number = 0):
+    def retrieve_stores_data_range(self, api_header_dict: dict[str, str], store_data_endpoint_template: str, max_store_number, min_store_number = 0):
         '''
         Returns the details for stores from min_store_number up to max_store_number.
             Parameters:
@@ -94,7 +94,7 @@ class DataExtractor:
         return store_data_list
     
     # download from s3 and extract the information returning a pandas DataFrame
-    def extract_from_s3(self, s3uri):
+    def extract_from_s3(self, s3uri: str) -> pd.DataFrame:
         '''
         Loads a table from a CSV in AWS S3.
             Parameters:
@@ -108,7 +108,7 @@ class DataExtractor:
         return pd.read_csv(s3response.get('Body'))
 
     # returns the number of stores to extract
-    def extract_from_json(self, url):
+    def extract_from_json(self, url: str) -> pd.DataFrame:
         '''
         Loads tables in a PDF into a dataframe.
             Parameters:

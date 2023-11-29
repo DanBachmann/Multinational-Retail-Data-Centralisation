@@ -16,7 +16,7 @@ class DatabaseConnector:
         return config
 
     # read the credentials from the return of db_creds and initialise and return an sqlalchemy database engine
-    def init_db_engine(self, config, prefix='RDS_'):
+    def init_db_engine(self, config: dict[str, str], prefix='RDS_'):
         '''
         Loads configuration for the databases from a file (db_creds.yaml).
             Parameters:
@@ -43,7 +43,7 @@ class DatabaseConnector:
         return inspector.get_table_names()
 
     # upload data to database table. NOTE: table & data will be replaced
-    def upload_to_db(self, source_data_frame, target_table_name, dtypes = None, primary_key = None):
+    def upload_to_db(self, source_data_frame, target_table_name: str, dtypes = None, primary_key = None):
         '''
         Save the dataframe in a table (target_table_name) on the local/target database.
             Parameters:
@@ -62,13 +62,13 @@ class DatabaseConnector:
             if primary_key is not None:
                 con.execute(sqlalchemy.text(f'ALTER TABLE public.{target_table_name} ADD PRIMARY KEY ({primary_key});'))
     
-    def add_foreign_key(self, target_table_name, target_column, source_table, source_column):
+    def add_foreign_key(self, target_table_name: str, target_column: str, source_table: str, source_column: str):
         db_creds = self.read_db_creds()
         target_engine = self.init_db_engine(db_creds, 'LOCAL_')
         with target_engine.execution_options(isolation_level='AUTOCOMMIT').connect() as con:
             con.execute(sqlalchemy.text(f'ALTER TABLE public.{target_table_name} ADD CONSTRAINT fk_{source_table}_{source_column} FOREIGN KEY ({target_column}) REFERENCES {source_table} ({source_column});'))
 
-    def drop_foreign_key(self, target_table_name, source_table, source_column):
+    def drop_foreign_key(self, target_table_name: str, source_table: str, source_column: str):
         db_creds = self.read_db_creds()
         target_engine = self.init_db_engine(db_creds, 'LOCAL_')
         try:

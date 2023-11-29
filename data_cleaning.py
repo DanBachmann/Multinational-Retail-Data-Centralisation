@@ -4,7 +4,7 @@ import re
 
 class DataCleaning:
     # clean the user data - handle NULL values, errors with dates, incorrectly typed values and rows filled with the wrong information.
-    def __handle_nulls_empties_and_duplicates(self, data_frame):
+    def __handle_nulls_empties_and_duplicates(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         for column in data_frame.columns:
                 data_frame[column] = data_frame[column].apply(self.__replace_null_strings)
         data_frame.drop_duplicates(inplace=True)
@@ -30,7 +30,7 @@ class DataCleaning:
                 cell_value = None
         return cell_value
 
-    def __reformat_phone_data(self, data_frame, column_name):
+    def __reformat_phone_data(self, data_frame: pd.DataFrame, column_name: str):
         regex_expression = r'^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$'
         data_frame.loc[~data_frame[column_name].str.match(regex_expression), column_name] = None # For every row where the column_name column does not match our regular expression, replace the value with None/null
         data_frame[column_name] = data_frame[column_name].replace({r'\+44(0)': '0',r'\+44': '0', r'\(': '', r'\)': '', r'-': '', r' ': ''}, regex=True)
@@ -77,7 +77,7 @@ class DataCleaning:
             return None
 
     # Convert all weights in a dataframe column to a decimal value represented in kg
-    def __convert_product_weights(self, products_data_frame):
+    def __convert_product_weights(self, products_data_frame: pd.DataFrame) -> pd.DataFrame:
         '''
         Modifiies dataframe column weight values to a decimal value represented in kg. If no units specified, presumes the weight is already in kg.
         For ml, a 1:1 ratio of ml to g is used as a rough estimate for the rows containing ml.
@@ -90,7 +90,7 @@ class DataCleaning:
         products_data_frame.weight = products_data_frame.weight.astype('float')
         return products_data_frame
     
-    def __assign_weight_class(self, weight):
+    def __assign_weight_class(self, weight: int) -> str:
         if weight < 2:
             return 'Light'
         if weight < 40:
@@ -99,7 +99,7 @@ class DataCleaning:
             return 'Heavy'
         return 'Truck_Required'
 
-    def clean_user_data(self, data_frame):
+    def clean_user_data(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         '''
         Cleans legacy user data and sets column types as appropriate.
                 Removes columns and rows with all null data and removes duplicates
@@ -131,7 +131,7 @@ class DataCleaning:
         return data_frame
 
     # remove any erroneous values, NULL values or errors with formatting.
-    def clean_card_data(self, data_frame):
+    def clean_card_data(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         '''
         Cleans legacy card data and sets column types as appropriate.
                 Removes columns and rows with all null data and removes duplicates
@@ -155,7 +155,7 @@ class DataCleaning:
         pd.options.mode.chained_assignment = 'warn'
         return data_frame
 
-    def clean_store_data(self, data_frame):
+    def clean_store_data(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         '''
         Cleans legacy store data and sets column types as appropriate.
                 Removes columns and rows with all null data and removes duplicates.
@@ -197,7 +197,7 @@ class DataCleaning:
         data_frame = data_frame[['store_code', 'store_type', 'staff_numbers', 'opening_date', 'address','locality', 'continent', 'country_code', 'longitude', 'latitude']]
         return data_frame
     
-    def clean_products_data(self, data_frame):
+    def clean_products_data(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         '''
         Cleans legacy products data and sets column types as appropriate.
                 Removes columns and rows with all null data and removes duplicates.
@@ -228,7 +228,7 @@ class DataCleaning:
         pd.options.mode.chained_assignment = 'warn'
         return data_frame
 
-    def clean_orders_data(self, data_frame):
+    def clean_orders_data(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         '''
         Cleans legacy orders data and sets column types as appropriate.
                 Removes columns and rows with all null data including first_name, last_name & '1' and removes duplicates.
@@ -243,7 +243,7 @@ class DataCleaning:
         data_frame.drop(['index'], axis=1, inplace=True)
         return self.__handle_nulls_empties_and_duplicates(data_frame)
 
-    def clean_time_data(self, data_frame):
+    def clean_time_data(self, data_frame: pd.DataFrame) -> pd.DataFrame:
         '''
         Cleans time table and sets column types as appropriate.
                 Removes columns and rows with all null data and removes duplicates.

@@ -25,7 +25,7 @@ class ProcessManager:
         for thread_function in self.thread_function_list:
             self.valid_arguments_list.append(thread_function.__name__)
 
-    def prerequisite_checks_ok(self, extensive):
+    def prerequisite_checks_ok(self, extensive: bool)  -> bool:
         logging.info("PREREQUISITE CHECK: database configurations load")
         db_creds = self.db_connector.read_db_creds()
         db_engine = self.db_connector.init_db_engine(db_creds)
@@ -84,7 +84,7 @@ class ProcessManager:
         logging.info("PREREQUISITE CHECKS: DONE")
         return True
 
-    def initialise_threads(self, argv):
+    def initialise_threads(self, argv: dict[str, str]) -> list[threading.Thread]:
         write_raw_data = 'write_raw' in  argv
 
         # do some optinal checks to be sure we are connected to the internet and critial components can execute
@@ -161,7 +161,7 @@ class ProcessManager:
         self.db_connector.drop_foreign_key(target_table, source_table, source_column)
         self.need_to_add_foreign_keys = True
 
-    def __upload_to_db_raw(self, data_frame, table_name):
+    def __upload_to_db_raw(self, data_frame, table_name: str):
         if self.write_raw_data:
             return self.__upload_to_db(data_frame, table_name+'_raw')
         return data_frame.shape[0]
