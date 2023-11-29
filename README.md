@@ -88,6 +88,9 @@ Running only the processes which are being worked on will also save time for end
 <code>python . process_orders</code><br>
 Will run just the code used to populate, clean and save the data. This also handles the removal and addition of foreign keys when any process is run.
 
+### Known Issues
+There are no known issues causing the expected output; however, an error warning is given for JPype1 which is used by the Tabula library. The library is handling the workaround for this gracefully. Attemping to install the JPype1 module's wheels have proved troublesome (Linux [Ubuntu LTS] miniconda) even with the help of the AiCore technical team. We've decided not for this to delay the project and it can be revisted with the plan to check the results with another operating system (Windows 10).
+
 ### Data Exploration and Debugging
 This exploratory.ipynb Jypiter notebook has utility classes for exploring our data to assist in the development and data cleaning processes. Beyond the basic checking of types and exploring tables on the RDS database, the write_raw option to write to an SQL database where queries can be used to explore the data is extremly valuable.
 
