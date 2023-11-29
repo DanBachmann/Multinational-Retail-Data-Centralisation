@@ -57,14 +57,12 @@ So a use with options to perform basic pre-requisite checks and process just the
 
 https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3606253/a9927149-f4aa-497e-b339-9cd708b9dfe4
 
-
 ### Reporting
 Ad hoc reporting is done with SQl queries in a tool such as PgAdmin. The data requests for milestone 4 are in <code>
 metrics_miletstone4.sql</code>
 where each query can be highlighted and quickly executed.
 
 https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3606253/fdfca68c-1929-4c1c-b782-0d0078ebc0af
-
 
 ## Developer Information
 ### Multi-threaded Architecture
