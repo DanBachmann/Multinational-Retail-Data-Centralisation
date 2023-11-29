@@ -33,7 +33,8 @@ To execute the project, we can simply run the directory such as:<br/>
 <code>python .</code>
 <br>
 
-https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/all_processes.mp4
+<video src='https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/all_processes.mp4' width=852>
+
 
 
 ### Optional Parameters
@@ -55,7 +56,7 @@ https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/mai
 So a use with options to perform basic pre-requisite checks and process just the users and cards would look like:<br/>
 <code>python . checks process_users process_cards</code>
 
-https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/selective_processes.mp4
+<video src='https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/selective_processes.mp4' width=852>
 
 
 ### Reporting
@@ -63,7 +64,7 @@ Ad hoc reporting is done with SQl queries in a tool such as PgAdmin. The data re
 metrics_miletstone4.sql</code>
 where each query can be highlighted and quickly executed.
 
-https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/database_queries.mp4
+<video src='https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/database_queries.mp4' width=852>
 
 
 ## Developer Information
