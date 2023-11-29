@@ -34,7 +34,7 @@ To execute the project, we can simply run the directory such as:<br/>
 <br>
 
 <video controls>
-  <source src="videos/all_processes.mp4" type="video/mp4">
+  <source src="https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/all_processes.mp4" type="video/mp4">
 </video>
 
 ### Optional Parameters
@@ -57,7 +57,7 @@ So a use with options to perform basic pre-requisite checks and process just the
 <code>python . checks process_users process_cards</code>
 
 <video controls>
-  <source src="videos/selective_processes.mp4" type="video/mp4">
+  <source src="https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/selective_processes.mp4" type="video/mp4">
 </video>
 
 ### Reporting
@@ -66,7 +66,7 @@ metrics_miletstone4.sql</code>
 where each query can be highlighted and quickly executed.
 
 <video controls>
-  <source src="videos/database_queries.mp4" type="video/mp4">
+  <source src="https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/database_queries.mp4" type="video/mp4">
 </video>
 
 ## Developer Information
