@@ -33,7 +33,7 @@ To execute the project, we can simply run the directory such as:<br/>
 <code>python .</code>
 <br>
 
-https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3606253/bfd1bc31-917d-4bec-9452-8833fdeb1d0a
+https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3606253/e70e4cab-fa30-4bae-a465-1a35d3398569
 
 
 ### Optional Parameters
