@@ -33,9 +33,8 @@ To execute the project, we can simply run the directory such as:<br/>
 <code>python .</code>
 <br>
 
-<video controls>
-  <source src="https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/all_processes.mp4" type="video/mp4">
-</video>
+https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/all_processes.mp4
+
 
 ### Optional Parameters
 <ul>
@@ -56,18 +55,16 @@ To execute the project, we can simply run the directory such as:<br/>
 So a use with options to perform basic pre-requisite checks and process just the users and cards would look like:<br/>
 <code>python . checks process_users process_cards</code>
 
-<video controls>
-  <source src="https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/selective_processes.mp4" type="video/mp4">
-</video>
+https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/selective_processes.mp4
+
 
 ### Reporting
 Ad hoc reporting is done with SQl queries in a tool such as PgAdmin. The data requests for milestone 4 are in <code>
 metrics_miletstone4.sql</code>
 where each query can be highlighted and quickly executed.
 
-<video controls>
-  <source src="https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/database_queries.mp4" type="video/mp4">
-</video>
+https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/blob/main/videos/database_queries.mp4
+
 
 ## Developer Information
 ### Multi-threaded Architecture
