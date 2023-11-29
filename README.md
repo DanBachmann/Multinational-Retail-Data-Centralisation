@@ -4,6 +4,7 @@ Multinational Retail Data Centralisation is a project to demonstrate data handin
 ## Concepts learned/demonstrated
 <ul>
 <li>Using lambdas/functions, masks and data series within Pandas for large scale data standardisation.
+<li>Python libraries for easily handling of CSV and PDF data files.
 <li>Postgresql table manipulation with SqlAlchemy.
 <li>Unit testing with Python.
 <li>Basic threading with Python.
@@ -27,7 +28,7 @@ More details can be found in the environment_configurations folder which has out
 ### Configuration Files
 There are two configuration files, db_creds.yaml and api_creds.yaml which contain all the configuration for the legacy source RDS database, target database, API endpoints and credentials. For security reasons, the files are not included in this repository, but templates are provided (db_creds-template.yaml and api_creds-template.yaml) in the environment_configurations folder. After filling these templates in, save them to the project root as db_creds.yaml and api_creds.yaml.
 
-## Usage instructions
+## Usage Instructions
 To execute the project, we can simply run the directory such as:<br/>
 <code>python .</code>
 <br>
@@ -51,7 +52,9 @@ So a use with options to perform basic pre-requisite checks and process just the
 <code>python . checks process_users process_cards</code>
 
 ### Reporting
-Ad hoc reporting is done with SQl queries in a tool such as PgAdmin. The data requests for milestone 4 are in metrics_miletstone4.sql where each query can be highlighted and quickly executed.
+Ad hoc reporting is done with SQl queries in a tool such as PgAdmin. The data requests for milestone 4 are in <code>
+metrics_miletstone4.sql</code>
+where each query can be highlighted and quickly executed.
 
 ## Developer Information
 ### Multi-threaded Architecture
