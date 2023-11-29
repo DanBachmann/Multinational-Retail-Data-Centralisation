@@ -1,6 +1,7 @@
 import yaml
 import sqlalchemy
 
+
 class DatabaseConnector:
     # read the credentials yaml file and return a dictionary of the credentials.
     def read_db_creds(self):

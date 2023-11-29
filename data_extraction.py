@@ -4,6 +4,7 @@ import requests
 import tabula
 import yaml
 
+
 class DataExtractor:
     # read the API credentials/URLs
     def read_api_creds(self):

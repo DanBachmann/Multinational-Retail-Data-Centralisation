@@ -1,6 +1,6 @@
 import pandas as pd
-import numpy as np
 import re
+
 
 class DataCleaning:
     # clean the user data - handle NULL values, errors with dates, incorrectly typed values and rows filled with the wrong information.

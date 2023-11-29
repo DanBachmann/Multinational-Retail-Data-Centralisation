@@ -5,6 +5,7 @@ from data_extraction import DataExtractor
 from database_utils import DatabaseConnector
 import sqlalchemy.types as types
 
+
 class ProcessManager:
     # initialise stateless worker classes
     db_connector = DatabaseConnector()
@@ -20,8 +21,16 @@ class ProcessManager:
     valid_arguments_list = []
 
     def __init__(self):
-        self.thread_function_list = [self.process_users, self.process_cards, self.process_stores, self.process_products, self.process_orders, self.process_times]
-        self.valid_arguments_list = ['checks_extensive', 'checks', 'write_raw', 'do_nothing']
+        self.thread_function_list = [self.process_users,
+                                     self.process_cards,
+                                     self.process_stores,
+                                     self.process_products,
+                                     self.process_orders,
+                                     self.process_times]
+        self.valid_arguments_list = ['checks_extensive',
+                                     'checks',
+                                     'write_raw',
+                                     'do_nothing']
         for thread_function in self.thread_function_list:
             self.valid_arguments_list.append(thread_function.__name__)
 
@@ -123,49 +132,60 @@ class ProcessManager:
             source_table = 'dim_products'
             source_column = 'product_code'
             target_column = source_column        
-            self.db_connector.add_foreign_key(target_table, target_column, source_table, source_column)
+            self.db_connector.add_foreign_key(target_table, target_column,
+                                              source_table, source_column)
             source_table = 'dim_store_details'
             source_column = 'store_code'
             target_column = source_column        
-            self.db_connector.add_foreign_key(target_table, target_column, source_table, source_column)
+            self.db_connector.add_foreign_key(target_table, target_column,
+                                              source_table, source_column)
             source_table = 'dim_card_details'
             source_column = 'card_number'
             target_column = source_column        
-            self.db_connector.add_foreign_key(target_table, target_column, source_table, source_column)
+            self.db_connector.add_foreign_key(target_table, target_column,
+                                              source_table, source_column)
             source_table = 'dim_users'
             source_column = 'user_uuid'
             target_column = source_column        
-            self.db_connector.add_foreign_key(target_table, target_column, source_table, source_column)
+            self.db_connector.add_foreign_key(target_table, target_column,
+                                              source_table, source_column)
             source_table = 'dim_date_times'
             source_column = 'date_uuid'
             target_column = source_column        
-            self.db_connector.add_foreign_key(target_table, target_column, source_table, source_column)
+            self.db_connector.add_foreign_key(target_table, target_column,
+                                              source_table, source_column)
 
     def __drop_foreign_keys(self):
         logging.info("dropping foreign keys on orders_table")
         target_table = 'orders_table'
         source_table = 'dim_products'
         source_column = 'product_code'
-        self.db_connector.drop_foreign_key(target_table, source_table, source_column)
+        self.db_connector.drop_foreign_key(target_table,
+                                           source_table, source_column)
         source_table = 'dim_store_details'
         source_column = 'store_code'
-        self.db_connector.drop_foreign_key(target_table, source_table, source_column)
+        self.db_connector.drop_foreign_key(target_table,
+                                           source_table, source_column)
         source_table = 'dim_card_details'
         source_column = 'card_number'
-        self.db_connector.drop_foreign_key(target_table, source_table, source_column)
+        self.db_connector.drop_foreign_key(target_table,
+                                           source_table, source_column)
         source_table = 'dim_users'
         source_column = 'user_uuid'
-        self.db_connector.drop_foreign_key(target_table, source_table, source_column)
+        self.db_connector.drop_foreign_key(target_table,
+                                           source_table, source_column)
         source_table = 'dim_date_times'
         source_column = 'date_uuid'
-        self.db_connector.drop_foreign_key(target_table, source_table, source_column)
+        self.db_connector.drop_foreign_key(target_table,
+                                           source_table, source_column)
         self.need_to_add_foreign_keys = True
 
     def __upload_to_db_raw(self, data_frame, table_name: str):
         if self.write_raw_data:
             return self.__upload_to_db(data_frame, table_name+'_raw')
         return data_frame.shape[0]
-    def __upload_to_db(self, data_frame, table_name, start_size, dtypes=None, primary_key=None):
+    def __upload_to_db(self, data_frame, table_name, start_size,
+                       dtypes=None, primary_key=None):
         if start_size is not None:
             reduction_percent = 100-100*data_frame.shape[0]/start_size
             if reduction_percent > 10:
@@ -193,7 +213,8 @@ class ProcessManager:
         # | user_uuid      | TEXT               | UUID               |
         # | join_date      | TEXT               | DATE               |
         country_code_max_len = data_frame.country_code.map(lambda x: len(x)).max()
-        dtypes={'first_name': types.VARCHAR(255), 'last_name': types.VARCHAR(255), 'country_code': types.VARCHAR(country_code_max_len),
+        dtypes={'first_name': types.VARCHAR(255), 'last_name': types.VARCHAR(255),
+                'country_code': types.VARCHAR(country_code_max_len),
             'date_of_birth': types.DATE, 'join_date': types.DATE,
             'user_uuid': types.UUID}
         self.__upload_to_db(data_frame, table_name, start_size, dtypes, 'user_uuid')
@@ -218,8 +239,12 @@ class ProcessManager:
         store_code_max_len = data_frame.store_code.map(lambda x: len(x)).max()
         card_number_max_len = data_frame.card_number.map(lambda x: len(str(x))).max()
         product_code_max_len = data_frame.product_code.map(lambda x: len(str(x))).max()
-        dtypes={'store_code': types.VARCHAR(store_code_max_len), 'card_number': types.VARCHAR(card_number_max_len), 'product_code': types.VARCHAR(product_code_max_len),
-            'product_quantity': types.SMALLINT, 'date_uuid': types.UUID, 'user_uuid': types.UUID}
+        dtypes={'store_code': types.VARCHAR(store_code_max_len), 
+                'card_number': types.VARCHAR(card_number_max_len), 
+                'product_code': types.VARCHAR(product_code_max_len),
+                'product_quantity': types.SMALLINT, 
+                'date_uuid': types.UUID, 
+                'user_uuid': types.UUID}
         self.__upload_to_db(data_frame, table_name, start_size, dtypes)
         self.need_to_add_foreign_keys = True
         logging.info("ORDERS: DONE. Foreign Keys to be added next.")
@@ -239,7 +264,9 @@ class ProcessManager:
         # | date_payment_confirmed | TEXT              | DATE               |
         card_number_max_len = data_frame.card_number.map(lambda x: len(str(x))).max()
         expiry_date_max_len = data_frame.expiry_date.map(lambda x: len(str(x))).max()
-        dtypes={'card_number': types.VARCHAR(card_number_max_len), 'expiry_date': types.VARCHAR(expiry_date_max_len), 'date_payment_confirmed': types.DATE}
+        dtypes={'card_number': types.VARCHAR(card_number_max_len), 
+                'expiry_date': types.VARCHAR(expiry_date_max_len), 
+                'date_payment_confirmed': types.DATE}
         self.__upload_to_db(data_frame, table_name, start_size, dtypes, 'card_number')
         logging.info("CARDS: DONE")
 
@@ -248,8 +275,11 @@ class ProcessManager:
         api_header_dict = {'x-api-key': self.api_config['stores_api_key']}
         number_stores_url = self.api_config['number_stores_url']
         store_data_template = self.api_config['store_data_template']
-        number_of_stores =  self.data_extractor.list_number_of_stores(api_header_dict, number_stores_url)
-        data_frame =  self.data_extractor.retrieve_stores_data(api_header_dict, store_data_template, number_of_stores)
+        number_of_stores =  self.data_extractor.list_number_of_stores(api_header_dict, 
+                                                                      number_stores_url)
+        data_frame =  self.data_extractor.retrieve_stores_data(api_header_dict, 
+                                                               store_data_template, 
+                                                               number_of_stores)
         logging.info("STORES: cleaning data")
         table_name = 'dim_store_details'
         start_size = self.__upload_to_db_raw(data_frame, table_name)
@@ -268,11 +298,16 @@ class ProcessManager:
         store_code_max_len = data_frame.store_code.map(lambda x: len(x)).max()
         country_code_max_len = data_frame.country_code.map(lambda x: len(x)).max()
         dtypes={'store_code': types.VARCHAR(store_code_max_len),
-            'locality': types.VARCHAR(255), 'country_code': types.VARCHAR(country_code_max_len), 'continent': types.VARCHAR(255),
-            'staff_numbers': types.SMALLINT, 'opening_date': types.DATE,
-            'longitude': types.FLOAT, 'latitude': types.FLOAT
+            'locality': types.VARCHAR(255), 
+            'country_code': types.VARCHAR(country_code_max_len),
+            'continent': types.VARCHAR(255),
+            'staff_numbers': types.SMALLINT,
+            'opening_date': types.DATE,
+            'longitude': types.FLOAT,
+            'latitude': types.FLOAT
             }
-        self.__upload_to_db(data_frame, table_name, start_size, dtypes, 'store_code')
+        self.__upload_to_db(data_frame, table_name, start_size, 
+                            dtypes, 'store_code')
         logging.info("STORES: DONE")
 
     def process_products(self):
@@ -296,13 +331,16 @@ class ProcessManager:
         EAN_max_len = data_frame.EAN.map(lambda x: len(str(x))).max()
         product_code_max_len = data_frame.product_code.map(lambda x: len(str(x))).max()
         weight_class_max_len = data_frame.weight_class.map(lambda x: len(x)).max()
-        dtypes={'EAN': types.VARCHAR(EAN_max_len), 'product_code': types.VARCHAR(product_code_max_len), 'weight_class': types.VARCHAR(weight_class_max_len),
-            'continent': types.VARCHAR(255),
-            'uuid': types.UUID, 'date_added': types.DATE,
-            'product_price': types.FLOAT, 'weight': types.FLOAT,
-            'currency': types.VARCHAR(3)
+        dtypes={'EAN': types.VARCHAR(EAN_max_len), 
+                'product_code': types.VARCHAR(product_code_max_len),
+                'weight_class': types.VARCHAR(weight_class_max_len),
+                'continent': types.VARCHAR(255),
+                'uuid': types.UUID, 'date_added': types.DATE,
+                'product_price': types.FLOAT, 'weight': types.FLOAT,
+                'currency': types.VARCHAR(3)
             }
-        self.__upload_to_db(data_frame, table_name, start_size, dtypes, 'product_code')
+        self.__upload_to_db(data_frame, table_name, start_size,
+                            dtypes, 'product_code')
         logging.info("PRODUCTS: DONE")
 
     def process_times(self):
@@ -314,10 +352,11 @@ class ProcessManager:
         start_size = self.__upload_to_db_raw(data_frame, table_name)
         data_frame =  self.data_cleaning.clean_time_data(data_frame)
 
-        # | month           | TEXT              | VARCHAR(?) - Already handled by making a standard datetime stamp. Will leave as is unless the project requires it different later.
-        # | year            | TEXT              | VARCHAR(?) - Already handled by making a standard datetime stamp. Will leave as is unless the project requires it different later.
-        # | day             | TEXT              | VARCHAR(?) - Already handled by making a standard datetime stamp. Will leave as is unless the project requires it different later.
-        # | time_period     | TEXT              | VARCHAR(?) - Already handled by making a standard datetime stamp. Will leave as is unless the project requires it different later.
+        # | month, year, day & time period
+        #   The above have already been handled during the data cleansing
+        #   implementation by making a standard datetime stamp.
+        #   This has made working with dates/times in the database
+        #   straightforward for sorting and grouping.
         # | date_uuid       | TEXT              | UUID               |
         dtypes={'date_uuid': types.UUID}
         self.__upload_to_db(data_frame, table_name, start_size, dtypes, 'date_uuid')

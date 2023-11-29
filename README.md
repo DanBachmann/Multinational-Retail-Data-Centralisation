@@ -11,7 +11,7 @@ Multinational Retail Data Centralisation is a project to demonstrate data handin
 <li>SQL lead function with CTE table
 </ul>
 
-## Installation Instructions
+## Installation Instructions / Dependancies
 This project was written for Python 3 with the following libraries and their dependancies:
 
       - boto3==1.29.4
@@ -32,6 +32,11 @@ There are two configuration files, db_creds.yaml and api_creds.yaml which contai
 To execute the project, we can simply run the directory such as:<br/>
 <code>python .</code>
 <br>
+
+<video controls>
+  <source src="videos/all_processes.mp4" type="video/mp4">
+</video>
+
 ### Optional Parameters
 <ul>
 <li>checks - perform basic pre-requisite checks
@@ -51,10 +56,18 @@ To execute the project, we can simply run the directory such as:<br/>
 So a use with options to perform basic pre-requisite checks and process just the users and cards would look like:<br/>
 <code>python . checks process_users process_cards</code>
 
+<video controls>
+  <source src="videos/selective_processes.mp4" type="video/mp4">
+</video>
+
 ### Reporting
 Ad hoc reporting is done with SQl queries in a tool such as PgAdmin. The data requests for milestone 4 are in <code>
 metrics_miletstone4.sql</code>
 where each query can be highlighted and quickly executed.
+
+<video controls>
+  <source src="videos/database_queries.mp4" type="video/mp4">
+</video>
 
 ## Developer Information
 ### Multi-threaded Architecture
