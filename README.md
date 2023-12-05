@@ -23,7 +23,11 @@ This project was written for Python 3 with the following libraries and their dep
       - requests==2.31.0
       - sqlalchemy==2.0.23
       - tabula-py==2.9.0
-More details can be found in the environment_configurations folder which has output from the conda environments used for both Linux and Windows envs.
+More details can be found in the environment_configurations folder which has output from the conda environments used for both Linux Ubuntu LTS) and Windows (10) envs.
+For database storage, the configuration is to use Posgresql; however, this could easily be changed to another SQL variant.
+
+### Issue with Python 3.12
+The code without flaw on Python 3.12.0; however, a submodule (JPype1) has dependencies which don't have Python 3.12 accepted yet making pip and conda installs fail. You'll see a warning appear about this with the resulting fall back to a 'subprocess'.
 
 ### Configuration Files
 There are two configuration files, db_creds.yaml and api_creds.yaml which contain all the configuration for the legacy source RDS database, target database, API endpoints and credentials. For security reasons, the files are not included in this repository, but templates are provided (db_creds-template.yaml and api_creds-template.yaml) in the environment_configurations folder. After filling these templates in, save them to the project root as db_creds.yaml and api_creds.yaml.
@@ -39,7 +43,7 @@ https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3
 ### Optional Parameters
 <ul>
 <li>checks - perform basic pre-requisite checks
-<li>checks_extensive - Performs extensive pre-requisite checks
+<li>checks_extensive - Performs extensive pre-requisite checks including the basic checks.
 <li>write_raw - In addition to writing the clean data to the database, write the raw data as well to the same table structure with the prefix _raw. This also includes the basic pre-requisite checks done in 'checks'
 <li>Be default, all processes are run; however, any combination can be run by specifying them as:
 <ul>
@@ -50,7 +54,7 @@ https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3
 <li>process_orders
 <li>process_times
 </ul>
-<li>do_nothing - do_nothing is specified, then no processing threads will run. This can be useful if only a pre-requisite check is desited.
+<li>do_nothing - do_nothing is specified, then no processing threads will run. This can be useful if only a pre-requisite check (options checks or checks_extensive) is desired.
 </ul>
 So a use with options to perform basic pre-requisite checks and process just the users and cards would look like:<br/>
 <code>python . checks process_users process_cards</code>
@@ -58,7 +62,7 @@ So a use with options to perform basic pre-requisite checks and process just the
 https://github.com/DanBachmann/Multinational-Retail-Data-Centralisation/assets/3606253/a9927149-f4aa-497e-b339-9cd708b9dfe4
 
 ### Reporting
-Ad hoc reporting is done with SQl queries in a tool such as PgAdmin. The data requests for milestone 4 are in <code>
+Ad hoc reporting is done with SQL queries in a tool such as PgAdmin. The data requests for milestone 4 are in <code>
 metrics_miletstone4.sql</code>
 where each query can be highlighted and quickly executed.
 
@@ -90,10 +94,6 @@ Will run just the code used to populate, clean and save the data. This also hand
 This exploratory.ipynb Jypiter notebook has utility classes for exploring our data to assist in the development and data cleaning processes. Beyond the basic checking of types and exploring tables on the RDS database, the write_raw option to write to an SQL database where queries can be used to explore the data is extremly valuable.<br>
 ![raw data table feature](media/raw_data_table_feature.png)
 
-### Known Issues
-There are no known issues causing the expected output; however, an error warning is given for JPype1 which is used by the Tabula library. The library is handling the workaround for this gracefully. Attemping to install the JPype1 module's wheels have proved troublesome (Linux [Ubuntu LTS] miniconda) even with the help of the AiCore technical team. We've decided not for this to delay the project and it can be revisted with the plan to check the results with another operating system (Windows 10).
-<br>
-update: This may be due to running the latest version of Python 3.12. There is a subcomponent with the requirements of having Python < 3.12.0a0.
 <hr>
 
 [![License](https://img.shields.io/badge/License-Boost_1.0-lightblue.svg)](https://www.boost.org/LICENSE_1_0.txt)
